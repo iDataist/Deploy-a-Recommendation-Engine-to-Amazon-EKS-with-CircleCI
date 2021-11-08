@@ -11,7 +11,6 @@ install:
 lint:
 	# hadolint Dockerfile --ignore DL3013
 	black --line-length 79 --experimental-string-processing .
-	flake8 .
 
 test:
 	python -m pytest -vv
