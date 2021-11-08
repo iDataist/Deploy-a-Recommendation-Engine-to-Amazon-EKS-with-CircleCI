@@ -1,0 +1,51 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: python:3.7.3-stretch
+    working_directory: ~/repo
+    steps:
+      - checkout
+      - run:
+          name: install dependencies
+          command: |
+            python3 -m venv venv
+            . venv/bin/activate
+            make install
+
+            wget -O /bin/hadolint https://github.com/hadolint/hadolint/releases/download/v1.16.3/hadolint-Linux-x86_64 &&\
+            chmod +x /bin/hadolint
+
+            pip install awscli
+
+            apk add --update curl
+            curl --silent --location "https://github.com/weaveworks/eksctl/releases/latest/download/eksctl_$(uname -s)_amd64.tar.gz" | tar xz -C /tmp
+            sudo mv /tmp/eksctl /usr/local/bin
+            eksctl version
+
+            curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+            sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
+            kubectl version --client
+      - run:
+          name: lint and test
+          command: |
+            . venv/bin/activate
+            make lint
+            make test
+      - run:
+          name: create an EKS (Kubernetes) cluster
+          command: |
+            eksctl create cluster --name recommendation-engine-api
+            kubectl get nodes
+      - run:
+          name: create an IAM role
+          command: |
+            aws iam create-role \
+              --role-name FlaskDeployCBKubectlRole \
+              --assume-role-policy-document file://trust.json \
+              --output text --query 'Role.Arn'
+            aws iam put-role-policy \
+              --role-name FlaskDeployCBKubectlRole \
+              --policy-name eks-describe \
+              --policy-document file://iam-role-policy.json
+            cat /System/Volumes/Data/private/tmp/aws-auth-patch.yml
