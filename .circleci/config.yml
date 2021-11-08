@@ -2,7 +2,7 @@ version: 2
 jobs:
   build:
     docker:
-      - image: python:3.7.3-stretch
+      - image: python:3.9.0-alpine
     working_directory: ~/repo
     steps:
       - checkout
@@ -11,14 +11,14 @@ jobs:
           command: |
             python3 -m venv venv
             . venv/bin/activate
-            make install
+            pip install --upgrade pip && pip install -r requirements.txt
 
             wget -O /bin/hadolint https://github.com/hadolint/hadolint/releases/download/v1.16.3/hadolint-Linux-x86_64 &&\
             chmod +x /bin/hadolint
 
             pip install awscli
 
-            apt-get install curl
+            apk add --update curl
             curl --silent --location "https://github.com/weaveworks/eksctl/releases/latest/download/eksctl_$(uname -s)_amd64.tar.gz" | tar xz -C /tmp
             sudo mv /tmp/eksctl /usr/local/bin
             eksctl version
@@ -30,8 +30,10 @@ jobs:
           name: lint and test
           command: |
             . venv/bin/activate
-            make lint
-            make test
+            hadolint Dockerfile --ignore DL3013
+            black --line-length 79 --experimental-string-processing .
+            flake8 .
+            python -m pytest -vv
       - run:
           name: create an EKS (Kubernetes) cluster
           command: |
