@@ -1,9 +1,14 @@
-version: 2
-jobs:
-  build:
+version: 2.1
+executors:
+  python:
     docker:
-      - image: python:3.9.0-alpine
-    working_directory: ~/repo
+      - image: python:3.7.3-stretch
+  aws:
+    docker:
+      - image: amazon/aws-cli
+jobs:
+  check-app:
+    executor: python
     steps:
       - checkout
       - run:
@@ -11,27 +16,44 @@ jobs:
           command: |
             python3 -m venv venv
             . venv/bin/activate
-            pip install --upgrade pip && pip install awscli black flake8 pytest
+            pip install --upgrade pip && pip install -r requirements.txt
 
             wget -O /bin/hadolint https://github.com/hadolint/hadolint/releases/download/v1.16.3/hadolint-Linux-x86_64 &&\
             chmod +x /bin/hadolint
+      - run:
+          name: test
+          command: |
+            . venv/bin/activate
+            make test
+      - run:
+          name: lint
+          command: |
+            . venv/bin/activate
+            make lint
 
-            apk add --update curl
+            apt-get install curl
             curl --silent --location "https://github.com/weaveworks/eksctl/releases/latest/download/eksctl_$(uname -s)_amd64.tar.gz" | tar xz -C /tmp
-            sudo mv /tmp/eksctl /usr/local/bin
+            mv /tmp/eksctl /usr/local/bin
             eksctl version
 
             curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
             sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
             kubectl version --client
+  create-infrastructure:
+    executor: aws
+    steps:
+      - checkout
       - run:
-          name: lint and test
+          name: install dependencies
           command: |
-            . venv/bin/activate
-            hadolint Dockerfile --ignore DL3013
-            black --line-length 79 --experimental-string-processing .
-            flake8 .
-            python -m pytest -vv
+            yum install -y tar gzip curl
+            curl --silent --location "https://github.com/weaveworks/eksctl/releases/latest/download/eksctl_$(uname -s)_amd64.tar.gz" | tar xz -C /tmp
+            mv /tmp/eksctl /usr/local/bin
+            eksctl version
+
+            curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+            sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
+            kubectl version --client
       - run:
           name: create an EKS (Kubernetes) cluster
           command: |
@@ -51,3 +73,9 @@ jobs:
 
             kubectl get -n kube-system configmap/aws-auth -o yaml > /tmp/aws-auth-patch.yml
             cat /System/Volumes/Data/private/tmp/aws-auth-patch.yml
+workflows:
+  default:
+    jobs:
+      - check-app
+      - create-infrastructure:
+          requires: [check-app]
