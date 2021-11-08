@@ -11,12 +11,10 @@ jobs:
           command: |
             python3 -m venv venv
             . venv/bin/activate
-            pip install --upgrade pip && pip install -r requirements.txt
+            pip install --upgrade pip && pip install awscli black flake8 pytest
 
             wget -O /bin/hadolint https://github.com/hadolint/hadolint/releases/download/v1.16.3/hadolint-Linux-x86_64 &&\
             chmod +x /bin/hadolint
-
-            pip install awscli
 
             apk add --update curl
             curl --silent --location "https://github.com/weaveworks/eksctl/releases/latest/download/eksctl_$(uname -s)_amd64.tar.gz" | tar xz -C /tmp
