@@ -7,8 +7,8 @@ WORKDIR /app
 COPY . /app/
 
 # Install packages from requirements.txt
-RUN pip install --upgrade pip &&\
-    pip install --trusted-host pypi.python.org -r requirements.txt
+RUN pip install --no-cache-dir --upgrade pip &&\
+    pip install --no-cache-dir --trusted-host pypi.python.org -r requirements.txt
 
 # Expose port 80
 EXPOSE 80
