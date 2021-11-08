@@ -6,3 +6,6 @@ numpy==1.21.2
 gunicorn==20.1.0
 uvicorn==0.15.0
 pickle5
+pytest
+flake8
+black
