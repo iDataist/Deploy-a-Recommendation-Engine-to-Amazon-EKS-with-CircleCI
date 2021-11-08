@@ -13,11 +13,10 @@ I containerized a movie recommendation Flask App using Docker and deployed the A
 
 ## Flask App
 The Flask app consists of a simple API with three endpoints:
-
 - `GET '/'`: This is a simple home page, which returns the response "Welcome: Movie Recommendation API Home".
 - `Get '/healthcheck'`: This is a simple health check, which returns the status code and whether the recommendation engine model has been loaded.
-
 - `POST '/predict'`: This takes a user_id and nrec_items as json arguments and returns a list of movies.
+![](screenshots/local1.png)
 
 ## Dependencies
 - Docker Engine
@@ -28,14 +27,16 @@ The Flask app consists of a simple API with three endpoints:
 ### Run the API Locally using the Flask Server
 - Create and activate the python environment: `python3 -m venv ~/.devops` and `source ~/.devops/bin/activate`.
 - Install python dependencies: `pip install -r requirements.txt`.
-- Start the app: `gunicorn -k uvicorn.workers.UvicornWorker -b :8080 main:app`
-- Generate recommendations: `bash make_prediction.sh 8080`
-
+- Start the app: `gunicorn -k uvicorn.workers.UvicornWorker -b :5000 main:app`
+- Generate recommendations: `bash make_prediction.sh 5000`
+![](screenshots/local2.png)
+![](screenshots/local3.png)
 ### Containerize the Flask App and Run Locally
 - Prerequisite - Docker Desktop: If you haven't installed Docker already, you should install now using [these installation instructions](https://docs.docker.com/get-docker/).
 - Build an image: `bash run_docker.sh`
 - Generate recommendations: `bash make_prediction.sh 80`
-
+![](screenshots/docker1.png)
+![](screenshots/docker2.png)
 ### Create an EKS Cluster and IAM Role
 1. Create an EKS (Kubernetes) Cluster
     - Create an EKS cluster named “recommendation-engine-api” in a region of your choice:
@@ -44,6 +45,8 @@ The Flask app consists of a simple API with three endpoints:
         eksctl create cluster --name recommendation-engine-api --region=us-east-1
         ```
     - Verify: `kubectl get nodes`.
+![](screenshots/eks.png)
+![](screenshots/node.png)
     - Delete: `eksctl delete cluster recommendation-engine-api  --region=<REGION>`
 2. Create an IAM Role
     - Get your AWS account id by running `aws sts get-caller-identity --query Account --output text`.
@@ -82,6 +85,7 @@ The Flask app consists of a simple API with three endpoints:
         aws iam put-role-policy --role-name FlaskDeployCBKubectlRole --policy-name eks-describe --policy-document file://iam-role-policy.json
         ```
     - Verify the newly created role in the IAM service
+![](screenshots/iam.png)
 3. Allowing the new role access to the cluster.
 
     - Fetch: Get the current configmap and save it to a file:
