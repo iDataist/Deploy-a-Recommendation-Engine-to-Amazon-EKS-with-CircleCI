@@ -111,7 +111,6 @@ The Flask app consists of a simple API with three endpoints:
             rolearn: arn:aws:iam::802504168056:role/FlaskDeployCBKubectlRole
             username: build
         ```
-
     - Update: Update your cluster's configmap:
         ```
         # Mac/Linux
@@ -146,16 +145,9 @@ The Flask app consists of a simple API with three endpoints:
         Step 3. Configure stack options - Leave default, and create the stack.
 3. CodeBuild
     In the previous step, the CloudFormation template file, ci-cd-codepipeline.cfn.yml, will automatically create a CodeBuild project. By default, the build process depends on the buildspec.yml file.
-
-    - buildspec.yml: The CodeBuild expects the build specification in a file named buildspec.yml (default name) to run a build. This file must be placed in the root of your source directory (Github repo). The buildspec.yml is a collection of build commands and related settings, in YAML format.
-
-        Note - In the buildspec.yml file, use the same (or closer) KUBECTL version as you've used while creating an EKS cluster (run kubectl version in your local terminal). To do so, uncomment and replace this line in the buildspec.yml with a specific version of your choice. Refer to the Install kubectl on Linux worker nodes for the available versions. (Mind the region in your URL too).
-
     - Details of the buildspec.yml: The buildspec.yml file specifies the different phases of a build, such as an install, pre-build, build, and post-build. Each phase has a set of commands to be automatically executed by CodeBuild. When you trigger a build in the CodeBuild, you can see each command being executed in the CodeBuild log console.
-
     - Trigger: Start the build process by clicking on the “Start build” button in the CodeBuild dashboard.
-
-5. Test the stack and API endpoints.
+4. Test the stack and API endpoints.
     To check if the pipeline works, commit a change to the master branch of your Github repo. In the AWS console go to the CodePipeline dashboard. You should see that the build is running.
     ```
     git add .
@@ -167,9 +159,9 @@ The Flask app consists of a simple API with three endpoints:
 
     Use the external IP url to test the app:
     ```
-    export TOKEN=`curl -d '{"email":"<EMAIL>","password":"<PASSWORD>"}' -H "Content-Type: application/json" -X POST <EXTERNAL-IP URL>/auth  | jq -r '.token'`
-
-    curl --request GET '<EXTERNAL-IP URL>/contents' -H "Authorization: Bearer ${TOKEN}" | jq
+    curl -d '{"user_id": 0, "nrec_items": 10}' \
+     -H "Content-Type: application/json" \
+     -X POST <EXTERNAL-IP URL>/predict
     ```
 
 
