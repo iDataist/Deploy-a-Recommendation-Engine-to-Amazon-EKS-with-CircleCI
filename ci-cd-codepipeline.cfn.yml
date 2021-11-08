@@ -16,7 +16,7 @@ Parameters:
   GitSourceRepo:
     Type: String
     Description: GitHub source repository - must contain a Dockerfile and buildspec.yml in the base
-    Default: Deploying-a-Flask-App-to-Kubernetes-with-a-CI-CD-pipeline
+    Default: Deploying-a-Recommendation-Engine-to-Amazon-EKS-with-a-CI-CD-pipeline
     MinLength: 1
     MaxLength: 100
     ConstraintDescription: You must enter a GitHub repository name
