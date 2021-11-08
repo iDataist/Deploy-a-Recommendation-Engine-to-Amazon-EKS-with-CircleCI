@@ -5,20 +5,15 @@ setup:
 
 install:
 	# This should be run from inside a virtualenv
-	pip install --no-cache-dir --upgrade pip &&\
-		pip install --no-cache-dir -r requirements.txt
-
-test:
-	# Additional, optional, tests could go here
-	python -m pytest -vv
+	pip install --upgrade pip &&\
+		pip install -r requirements.txt
 
 lint:
-	# See local hadolint install instructions:   https://github.com/hadolint/hadolint
-	# This is linter for Dockerfiles
-	hadolint Dockerfile
-	# This is a linter for Python source code linter: https://www.pylint.org/
-	# This should be run from inside a virtualenv
+	# hadolint Dockerfile --ignore DL3013
 	black --line-length 79 --experimental-string-processing .
 	flake8 .
+
+test:
+	python -m pytest -vv
 
 all: install lint test
