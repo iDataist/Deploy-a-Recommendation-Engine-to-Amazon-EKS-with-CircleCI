@@ -94,7 +94,9 @@ async def predict(features: Features):
     if (features.user_id) > 942 or (features.user_id) < 0:
         raise HTTPException(status_code=404, detail="User not found.")
 
-    arr = model.predict(features.user_id, np.arange(1682), item_features=item_features)
+    arr = model.predict(
+        features.user_id, np.arange(1682), item_features=item_features
+    )
     sorted_ind = np.argsort(arr)[::-1][: features.nrec_items]
     top_n_items = [item_map[x] for x in sorted_ind]
     logger.info(f"recommendation: {top_n_items}")
