@@ -14,5 +14,5 @@ RUN pip install --upgrade pip &&\
 EXPOSE 80
 
 # Run app.py at container launch
-# gunicorn -k uvicorn.workers.UvicornWorker -b :5000 serve:app
-ENTRYPOINT ["gunicorn", "-k", "uvicorn.workers.UvicornWorker", "-b", ":5000", "main:app"]
+# gunicorn -k uvicorn.workers.UvicornWorker -b :8080 main:app
+ENTRYPOINT ["gunicorn", "-k", "uvicorn.workers.UvicornWorker", "-b", ":8080", "main:app"]
