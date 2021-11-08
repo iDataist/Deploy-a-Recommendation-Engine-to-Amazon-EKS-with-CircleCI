@@ -2,7 +2,7 @@ version: 2
 jobs:
   build:
     docker:
-      - image: python:3.9.0-alpine
+      - image: python:3.7.3-stretch
     working_directory: ~/repo
     steps:
       - checkout
@@ -18,7 +18,7 @@ jobs:
 
             pip install awscli
 
-            apk add --update curl
+            apt-get install curl
             curl --silent --location "https://github.com/weaveworks/eksctl/releases/latest/download/eksctl_$(uname -s)_amd64.tar.gz" | tar xz -C /tmp
             sudo mv /tmp/eksctl /usr/local/bin
             eksctl version
