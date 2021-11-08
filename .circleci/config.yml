@@ -50,4 +50,6 @@ jobs:
               --role-name FlaskDeployCBKubectlRole \
               --policy-name eks-describe \
               --policy-document file://iam-role-policy.json
+
+            kubectl get -n kube-system configmap/aws-auth -o yaml > /tmp/aws-auth-patch.yml
             cat /System/Volumes/Data/private/tmp/aws-auth-patch.yml
