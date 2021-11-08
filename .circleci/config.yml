@@ -2,7 +2,7 @@ version: 2
 jobs:
   build:
     docker:
-      - image: python:3.7.3-stretch
+      - image: python:3.9.0-alpine
     working_directory: ~/repo
     steps:
       - checkout
