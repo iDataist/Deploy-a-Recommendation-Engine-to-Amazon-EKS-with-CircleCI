@@ -1,7 +1,8 @@
-# Deploying a Recommendation Engine to Amazon Elastic Kubernetes Service with a CI/CD pipeline
+# Deploying a Recommendation Engine to Amazon EKS with CircleCI
 
 ## Overview
 I containerized a movie recommendation Flask App using Docker and deployed the App to a Kubernetes cluster with a CI/CD pipeline. I associated the pipeline's one end to the Github repository (containing the application code), and connected the other end to the EKS cluster. Below is the architecture diagram of the deployed App with four main actions:
+
 ![](architecture.png)
 1. Code check-in - The application code for the Flask app is hosted on Github. Multiple contributors can contribute to the repository collaboratively.
 
@@ -19,9 +20,9 @@ The Flask app consists of a simple API with three endpoints:
 ![](screenshots/local1.png)
 
 ## Dependencies
+- CircleCI
 - Docker Engine
- - AWS Account
-- AWS, EKSCTL and KUBECTL CLI
+- AWS
 
 ## Project Steps
 ### Run the API Locally using the Flask Server
@@ -41,8 +42,8 @@ The Flask app consists of a simple API with three endpoints:
 1. Create an EKS (Kubernetes) Cluster
     - Create an EKS cluster named “recommendation-engine-api” in a region of your choice:
         ```
-        # Create a cluster in a specific region, such as us-east-2
-        eksctl create cluster --name recommendation-engine-api --region=us-east-1
+        # Create a cluster
+        eksctl create cluster --name recommendation-engine-api
         ```
     - Verify: `kubectl get nodes`.
 ![](screenshots/eks.png)
