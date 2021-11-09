@@ -41,6 +41,7 @@ jobs:
           name: Install awscli and gettext-base
           command: |
             sudo pip3 install awscli
+            sudo apt-get install gettext-base
       - run:
           name: Install aws-iam-authenticator
           command: |
@@ -77,11 +78,12 @@ jobs:
 workflows:
   build-test-and-deploy:
     jobs:
-      - check-app
-      - build_image_and_deploy_staging:
-          requires:
-            - check-app
-          filters:
-            branches:
-              only:
-                - main
+      - build_image_and_deploy_staging
+      # - check-app
+      # - build_image_and_deploy_staging:
+      #     requires:
+      #       - check-app
+      #     filters:
+      #       branches:
+      #         only:
+      #           - main
