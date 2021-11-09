@@ -54,13 +54,13 @@ jobs:
             curl -o kubectl https://amazon-eks.s3-us-west-2.amazonaws.com/1.13.7/2019-06-11/bin/linux/amd64/kubectl
             chmod +x ./kubectl
             sudo mv ./kubectl /usr/local/bin/kubectl
-      # - setup_remote_docker
-      # - run:
-      #     name: Login to repository and build docker image
-      #     command: |
-      #       eval $(aws ecr get-login --region $AWS_DEFAULT_REGION --no-include-email)
-      #       docker build -t ${AWS_REPOSITORY_URL}/${REPOSITORY_NAME}:$RUN_ID . -f Dockerfile
-      #       docker push ${AWS_REPOSITORY_URL}/${REPOSITORY_NAME}:$RUN_ID
+      - setup_remote_docker
+      - run:
+          name: Login to repository and build docker image
+          command: |
+            eval $(aws ecr get-login --region $AWS_DEFAULT_REGION --no-include-email)
+            docker build -t ${AWS_REPOSITORY_URL}/${REPOSITORY_NAME}:$RUN_ID . -f Dockerfile
+            docker push ${AWS_REPOSITORY_URL}/${REPOSITORY_NAME}:$RUN_ID
       - run:
           name: Prepare K8S templates
           command: |
@@ -78,12 +78,11 @@ jobs:
 workflows:
   build-test-and-deploy:
     jobs:
-      - build_image_and_deploy_staging
-      # - check-app
-      # - build_image_and_deploy_staging:
-      #     requires:
-      #       - check-app
-      #     filters:
-      #       branches:
-      #         only:
-      #           - main
+      - check-app
+      - build_image_and_deploy_staging:
+          requires:
+            - check-app
+          filters:
+            branches:
+              only:
+                - main
