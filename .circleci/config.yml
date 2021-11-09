@@ -49,8 +49,8 @@ jobs:
           name: Login to repository and build docker image
           command: |
             eval $(aws ecr get-login --region $AWS_DEFAULT_REGION --no-include-email)
-            docker build -t ${AWS_REPOSITORY_URL}/${REPOSITORY_NAME}:$RUN_ID .
-            docker push ${AWS_REPOSITORY_URL}/${REPOSITORY_NAME}:$RUN_ID
+            docker build -t ${AWS_REPOSITORY_URL}/${REPOSITORY_NAME}:$RUN_ID . -f Dockerfile.Dockerfile
+            docker push ${AWS_REPOSITORY_URL}/${REPOSITORY_NAME}:$RUN_ID -f Dockerfile.Dockerfile
       - run:
           name: Prepare K8S templates
           command: |
