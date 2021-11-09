@@ -11,8 +11,8 @@ In this project, I used CircleCI to develop a CI/CD pipeline with rolling deploy
 ## Project Steps
 
 - Using Circle CI, and implementing rolling deployment
-    * I set up a circle CI account and connected the git repository
-    * I set up the environment to deploy code
+    * Setting up a [circle CI account](https://circleci.com/signup/?source-button=free) and connected the git repository
+    * Setting up the environment to deploy code
     ![](screenshots/env.png)
 
 - Building Kubernetes cluster
@@ -21,10 +21,14 @@ In this project, I used CircleCI to develop a CI/CD pipeline with rolling deploy
     ![](screenshots/cloudformation2.png)
     ![](screenshots/eks.png)
     ![](screenshots/ec2.png)
-
-- Building and testing the pipeline
+    ![](screenshots/node1.png)
+    ![](screenshots/node2.png)
+- Building the pipeline
     I built the CI/CD pipeline with CircleCI.
-    ![](screenshots/lint.png)
-    ![](screenshots/new_pipeline.png)
-    ![](screenshots/ec2.png)
+    ![](screenshots/pipeline.png)
+    ![](screenshots/ecr.png)
+    ![](screenshots/pod.png)
 
+- Testing the pipeline
+    ![](screenshots/predict.png)
+    ![](screenshots/app.png)
