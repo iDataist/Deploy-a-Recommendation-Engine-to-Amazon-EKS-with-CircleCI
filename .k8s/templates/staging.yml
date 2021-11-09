@@ -9,7 +9,7 @@ data:
   ENV_VALUE2: ${ENV_VALUE2}
 
 ---
-apiVersion: apps/v1beta1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: app-staging-deployment
