@@ -4,7 +4,6 @@ jobs:
   check-app:
     docker:
       - image: python:3.7.3-stretch
-    working_directory: ~/repo
     steps:
       - checkout
       - restore_cache:
@@ -37,8 +36,8 @@ jobs:
   build_image_and_deploy_staging:
     docker:
       - image: circleci/python:3.7
-    working_directory: ~/repo
     steps:
+      - checkout
       - run:
           name: Install awscli and gettext-base
           command: |
