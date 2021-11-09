@@ -4,7 +4,6 @@ jobs:
   check-app:
     docker:
       - image: python:3.7.3-stretch
-    working_directory: ~/app
     steps:
       - checkout
       - run:
@@ -13,9 +12,8 @@ jobs:
             python3 -m venv venv
             . venv/bin/activate
             pip install --upgrade pip && pip install -r requirements.txt
-
-            wget -O /bin/hadolint https://github.com/hadolint/hadolint/releases/download/v1.16.3/hadolint-Linux-x86_64 &&\
-            chmod +x /bin/hadolint
+            # wget -O /bin/hadolint https://github.com/hadolint/hadolint/releases/download/v1.16.3/hadolint-Linux-x86_64 &&\
+            # chmod +x /bin/hadolint
       - run:
           name: test
           command: |
@@ -29,7 +27,6 @@ jobs:
   build_image_and_deploy_staging:
     docker:
       - image: circleci/python:3.7
-    working_directory: ~/app
     steps:
       - run:
           name: Install awscli and gettext-base
