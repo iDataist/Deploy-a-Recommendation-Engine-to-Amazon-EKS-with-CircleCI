@@ -25,6 +25,7 @@ I built the Kubernetes cluster by running `eksctl create cluster --name eks-asdf
 I built the CI/CD pipeline with CircleCI.
 
 ## Step 5: Test your pipeline
-![](screenshots/pipeline.png)
+![](screenshots/lint.png)
+![](screenshots/new_pipeline.png)
 ![](screenshots/ec2.png)
 
