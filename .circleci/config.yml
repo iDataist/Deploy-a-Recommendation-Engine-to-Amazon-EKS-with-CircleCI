@@ -59,10 +59,10 @@ jobs:
       - run:
           name: create an IAM role
           command: |
-            aws iam create-role \
-              --role-name FlaskDeployCBKubectlRole \
-              --assume-role-policy-document file://trust.json \
-              --output text --query 'Role.Arn'
+            # aws iam create-role \
+            #   --role-name FlaskDeployCBKubectlRole \
+            #   --assume-role-policy-document file://trust.json \
+            #   --output text --query 'Role.Arn'
             aws iam put-role-policy \
               --role-name FlaskDeployCBKubectlRole \
               --policy-name eks-describe \
