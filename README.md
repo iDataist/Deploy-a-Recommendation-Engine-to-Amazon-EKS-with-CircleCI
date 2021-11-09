@@ -9,7 +9,6 @@ In this project, I used CircleCI to develop a CI/CD pipeline with rolling deploy
 * Working with eksctl and kubectl to build and deploy Kubernetes clusters
 
 ## Project Steps
-
 - Using Circle CI, and implementing rolling deployment
     * Setting up a [circle CI account](https://circleci.com/signup/?source-button=free) and connected the git repository
     * Setting up the environment to deploy code
