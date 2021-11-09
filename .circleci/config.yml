@@ -1,14 +1,10 @@
+---
 version: 2.1
-executors:
-  python:
-    docker:
-      - image: python:3.7.3-stretch
-  aws:
-    docker:
-      - image: amazon/aws-cli
 jobs:
   check-app:
-    executor: python
+    docker:
+      - image: python:3.7.3-stretch
+    working_directory: ~/app
     steps:
       - checkout
       - run:
@@ -30,46 +26,57 @@ jobs:
           command: |
             . venv/bin/activate
             make lint
-  create-infrastructure:
-    executor: aws
+  build_image_and_deploy_staging:
+    docker:
+      - image: circleci/python:3.7
+    working_directory: ~/app
     steps:
-      - checkout
       - run:
-          name: install dependencies
+          name: Install awscli and gettext-base
           command: |
-            yum install -y tar gzip curl
-
-            curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
-            install minikube-linux-amd64 /usr/local/bin/minikube
-            minikube start
-
-            curl --silent --location "https://github.com/weaveworks/eksctl/releases/latest/download/eksctl_$(uname -s)_amd64.tar.gz" | tar xz -C /tmp
-            mv /tmp/eksctl /usr/local/bin
-            echo "eksctl version"
-            eksctl version
-      # - run:
-      #     name: create an EKS (Kubernetes) cluster
-      #     command: |
-      #       eksctl create cluster --name recommendation-engine-api-$RUN_ID
-      #       kubectl get nodes
+            sudo pip3 install awscli
       - run:
-          name: create an IAM role
+          name: Install aws-iam-authenticator
           command: |
-            # aws iam create-role \
-            #   --role-name FlaskDeployCBKubectlRole-$RUN_ID \
-            #   --assume-role-policy-document file://trust.json \
-            #   --output text --query 'Role.Arn'
-            # aws iam put-role-policy \
-            #   --role-name FlaskDeployCBKubectlRole-$RUN_ID \
-            #   --policy-name eks-describe \
-            #   --policy-document file://iam-role-policy.json
+            curl -o aws-iam-authenticator curl -o aws-iam-authenticator https://amazon-eks.s3-us-west-2.amazonaws.com/1.13.7/2019-06-11/bin/linux/amd64/aws-iam-authenticator
+            chmod +x ./aws-iam-authenticator
+            sudo mv ./aws-iam-authenticator /usr/local/bin/aws-iam-authenticator
+      - run:
+          name: Install kubectl
+          command: |
+            curl -o kubectl https://amazon-eks.s3-us-west-2.amazonaws.com/1.13.7/2019-06-11/bin/linux/amd64/kubectl
+            chmod +x ./kubectl
+            sudo mv ./kubectl /usr/local/bin/kubectl
+      - setup_remote_docker
+      - run:
+          name: Login to repository and build docker image
+          command: |
+            eval $(aws ecr get-login --region $AWS_DEFAULT_REGION --no-include-email)
+            docker build -t ${AWS_REPOSITORY_URL}/${REPOSITORY_NAME}:$RUN_ID .
+            docker push ${AWS_REPOSITORY_URL}/${REPOSITORY_NAME}:$RUN_ID
+      - run:
+          name: Prepare K8S templates
+          command: |
+            aws eks --region $AWS_DEFAULT_REGION update-kubeconfig --name eks-$RUN_ID
+            rm -rf .k8s/.generated && mkdir -p .k8s/.generated
+            for f in .k8s/templates/staging.yml
+              do
+              envsubst < $f > ".k8s/.generated/$(basename $f)"
+            done
+      - run:
+          name: Deploy
+          command: |
+            kubectl apply -f .k8s/.generated/ --validate=true
+            kubectl get pod
 
-            kubectl get -n kube-system configmap/aws-auth -o yaml > /tmp/aws-auth-patch.yml
-            cat /System/Volumes/Data/private/tmp/aws-auth-patch.yml
 workflows:
-  default:
+  build-test-and-deploy:
     jobs:
-      - create-infrastructure
-      # - check-app
-      # - create-infrastructure:
-      #     requires: [check-app]
+      - check-app
+      - build_image_and_deploy_staging:
+          requires:
+            - check-app
+          filters:
+            branches:
+              only:
+                - main
