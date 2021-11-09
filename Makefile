@@ -9,7 +9,7 @@ install:
 		pip install --requirement requirements.txt
 
 lint:
-	hadolint Dockerfile --ignore DL3013
+	hadolint Dockerfile
 	# black --line-length 79 --experimental-string-processing .
 
 test:
