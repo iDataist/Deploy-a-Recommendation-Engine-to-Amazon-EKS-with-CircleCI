@@ -39,13 +39,9 @@ jobs:
           command: |
             yum install -y tar gzip curl
 
-            curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
-            install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
-            chmod +x kubectl
-            mkdir -p ~/.local/bin/kubectl
-            mv ./kubectl ~/.local/bin/kubectl
-            echo "kubectl version"
-            kubectl version --short --client
+            curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
+            install minikube-linux-amd64 /usr/local/bin/minikube
+            minikube start
 
             curl --silent --location "https://github.com/weaveworks/eksctl/releases/latest/download/eksctl_$(uname -s)_amd64.tar.gz" | tar xz -C /tmp
             mv /tmp/eksctl /usr/local/bin
@@ -54,19 +50,19 @@ jobs:
       # - run:
       #     name: create an EKS (Kubernetes) cluster
       #     command: |
-      #       eksctl create cluster --name recommendation-engine-api
+      #       eksctl create cluster --name recommendation-engine-api-$RUN_ID
       #       kubectl get nodes
       - run:
           name: create an IAM role
           command: |
             # aws iam create-role \
-            #   --role-name FlaskDeployCBKubectlRole \
+            #   --role-name FlaskDeployCBKubectlRole-$RUN_ID \
             #   --assume-role-policy-document file://trust.json \
             #   --output text --query 'Role.Arn'
-            aws iam put-role-policy \
-              --role-name FlaskDeployCBKubectlRole \
-              --policy-name eks-describe \
-              --policy-document file://iam-role-policy.json
+            # aws iam put-role-policy \
+            #   --role-name FlaskDeployCBKubectlRole-$RUN_ID \
+            #   --policy-name eks-describe \
+            #   --policy-document file://iam-role-policy.json
 
             kubectl get -n kube-system configmap/aws-auth -o yaml > /tmp/aws-auth-patch.yml
             cat /System/Volumes/Data/private/tmp/aws-auth-patch.yml
