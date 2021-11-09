@@ -1,0 +1,49 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-config
+  labels:
+    app: app-staging
+data:
+  ENV_VALUE1: ${STAGING_ENV_VALUE1}
+  ENV_VALUE2: ${ENV_VALUE2}
+
+---
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: app-staging-deployment
+  labels:
+    app: app-staging
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: app-staging
+  template:
+    metadata:
+      labels:
+        app: app-staging
+    spec:
+      containers:
+        - name: app-staging
+          image: ${AWS_REPOSITORY_URL}/${REPOSITORY_NAME}:$RUN_ID
+          ports:
+            - containerPort: 5000
+          envFrom:
+            - configMapRef:
+                name: app-config
+
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: app-staging-service
+spec:
+  type: LoadBalancer
+  selector:
+    app: app-staging
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 5000
